@@ -11,6 +11,21 @@ export default function Home() {
   const [location, setLocation] = useState({});
   const { network, isLoading, isError } = useNetwork();
 
+  // Zo vang je alle asynchrone fouten op en zie je in de console de echte err.message en err.stack in plaats van {}
+  useEffect(() => {
+    async function loadStations() {
+      try {
+        const res = await fetch('/api/stations');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        setStations(data);
+      } catch (err) {
+        console.error('Stations laden mislukt:', err);
+      }
+    }
+    loadStations();
+  }, []);
+
   // use effect gebruiken om bv iets op te roepen enkel bij opstart van de app
   useEffect(() => {
     if (navigator.geolocation) {
