@@ -3,15 +3,22 @@
 import styles from './page.module.css';
 import useNetwork from '@/data/network';
 
-export default function About() {
-  const { network, isLoading, isError } = useNetwork();
+import StatsCard from '@/components/StatsCard';
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error</div>;
+// Dummy data voor StatsCard
+const stats = {
+  level: 5,
+  xp: 125,
+  xpToNext: 250,
+  bikesMoved: 32,
+  stationsHelped: 6,
+};
 
+export default function Home() {
   return (
-    <div>
-      <h1 className={styles.title}>About {network.name}</h1>
-    </div>
+    <main className="max-w-md mx-auto p-4">
+      <StatsCard {...stats} />
+      {/* later kun je hier nog StationItem-list zetten */}
+    </main>
   );
 }

@@ -1,0 +1,64 @@
+/* src/components/StationItem.module.css */
+
+.container {
+  background: #ffffff;
+  border-radius: 0.5rem; /* 8px */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1rem; /* 16px */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+}
+
+.status {
+  font-size: 0.75rem; /* 12px */
+  color: #6b7280; /* grey-500 */
+  margin-bottom: 0.25rem; /* 4px */
+}
+
+.title {
+  font-weight: 600;
+  font-size: 1rem; /* 16px */
+  margin-bottom: 0.25rem; /* 4px */
+}
+
+.distance {
+  font-size: 0.75rem; /* 12px */
+  color: #6b7280; /* grey-500 */
+}
+
+.availability {
+  font-size: 0.875rem; /* 14px */
+  font-weight: 500;
+}
+
+.xp {
+  font-weight: 600;
+  color: #3b82f6; /* blue-500 */
+  font-size: 0.875rem; /* 14px */
+  margin-bottom: 0.25rem; /* 4px */
+}
+
+.button {
+  padding: 0.25rem 0.75rem; /* 4px 12px */
+  border: 1px solid #3b82f6; /* blue-500 */
+  border-radius: 0.25rem; /* 4px */
+  background: transparent;
+  font-size: 0.875rem; /* 14px */
+  font-weight: 500;
+  color: #3b82f6; /* blue-500 */
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.button:hover {
+  background: #3b82f6; /* blue-500 */
+  color: #ffffff; /* white */
+}

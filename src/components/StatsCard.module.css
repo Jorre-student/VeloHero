@@ -1,0 +1,61 @@
+/* src/components/StatsCard.module.css */
+
+.container {
+  background: white;
+  border-radius: 0.5rem; /* 8px */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1rem; /* 16px */
+}
+
+.header {
+  display: flex;
+  align-items: center;
+}
+
+.level {
+  font-size: 2.25rem; /* 36px */
+  font-weight: bold;
+}
+
+.progressWrapper {
+  margin-left: 1rem;
+  flex: 1;
+}
+
+.progressText {
+  font-size: 0.875rem; /* 14px */
+  margin-bottom: 0.25rem;
+}
+
+.progressBar {
+  height: 0.5rem; /* 8px */
+  background: #e5e7eb; /* grey-200 */
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  background: #3b82f6; /* blue-500 */
+  border-radius: inherit;
+}
+
+.stats {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.statItem {
+  text-align: center;
+}
+
+.statNumber {
+  font-weight: bold;
+  font-size: 1.125rem; /* 18px */
+}
+
+.statLabel {
+  font-size: 0.875rem; /* 14px */
+  color: #6b7280; /* grey-500 */
+}
