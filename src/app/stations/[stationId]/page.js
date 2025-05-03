@@ -1,26 +1,33 @@
+// File: src/app/stations/page.js
 'use client';
 
-import styles from './page.module.css';
+import React from 'react';
+import Link from 'next/link';
+import StationItem from '@/components/StationItem';
 import useNetwork from '@/data/network';
-import { useParams } from 'next/navigation';
-import StationImage from '@/components/StationImage';
+import styles from './page.module.css';
 
-export default function Station() {
-  const { network, isLoading, isError } = useNetwork();
-  const params = useParams();
+export default function StationsPage() {
+  const { stations, isLoading, isError } = useNetwork();
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error</div>;
-
-  const station = network.stations.find(
-    (station) => station.id === params.stationId
-  );
+  if (isLoading) {
+    return <div className={styles.message}>Even laden…</div>;
+  }
+  if (isError) {
+    return <div className={styles.message}>Fout bij laden stations</div>;
+  }
 
   return (
-    <div>
-      <h1 className={styles.title}>{station.name}</h1>
-      <p>{station.free_bikes}</p>
-      <StationImage station={station} />
-    </div>
+    <main className={styles.container}>
+      <h1 className={styles.heading}>Alle stations</h1>
+      <Link href="/" className={styles.backLink}>
+        ← Terug naar Home
+      </Link>
+      <div className={styles.list}>
+        {stations.map((station) => (
+          <StationItem key={station.id} {...station} />
+        ))}
+      </div>
+    </main>
   );
 }
