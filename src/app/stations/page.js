@@ -11,57 +11,46 @@ import styles from './page.module.css';
 export default function StationsPage() {
   const { stations, userLocation, isLoading, isError } = useNetwork();
   const [search, setSearch] = useState('');
-  const [sortBy, setSortBy] = useState('xp'); // 'xp' or 'distance'
+  const [sortBy, setSortBy] = useState('xp');
 
-  if (isLoading) return <div className={styles.message}>Even laden…</div>;
-  if (isError)
-    return <div className={styles.message}>Fout bij laden stations</div>;
-
-  // Verrijk stations met afstand en label
+  // Hooks in vaste volgorde
   const enriched = useMemo(
-    () =>
-      stations.map((s) => {
-        const { distance } = getDistance(
-          userLocation.lat,
-          userLocation.lng,
-          s.coords.lat,
-          s.coords.lng
-        );
-        const label =
-          distance < 1000
-            ? `${distance} m`
-            : `${(distance / 1000).toFixed(1)} km`;
-        return { ...s, distance, distanceLabel: label };
-      }),
+    () => stations.map((s) => {
+      const { distance } = getDistance(
+        userLocation.lat,
+        userLocation.lng,
+        s.coords.lat,
+        s.coords.lng
+      );
+      const label = distance < 1000 ? `${distance} m` : `${(distance / 1000).toFixed(1)} km`;
+      return { ...s, distance, distanceLabel: label };
+    }),
     [stations, userLocation]
   );
 
-  // Nearest station ID
   const nearestId = useMemo(() => {
-    const n = enriched.reduce(
-      (best, s) => (!best || s.distance < best.distance ? s : best),
-      null
-    );
-    return n?.id;
+    const nearest = enriched.reduce((best, s) => (!best || s.distance < best.distance) ? s : best, null);
+    return nearest?.id;
   }, [enriched]);
 
-  // Filter & sort
   const filtered = useMemo(
-    () =>
-      enriched
-        .filter((s) => s.name.toLowerCase().includes(search.toLowerCase()))
-        .sort((a, b) =>
-          sortBy === 'xp' ? b.xp - a.xp : a.distance - b.distance
-        ),
+    () => enriched
+      .filter((s) => s.name.toLowerCase().includes(search.toLowerCase()))
+      .sort((a, b) => sortBy === 'xp' ? b.xp - a.xp : a.distance - b.distance),
     [enriched, search, sortBy]
   );
+
+  if (isLoading) {
+    return <div className={styles.message}>Even laden…</div>;
+  }
+  if (isError) {
+    return <div className={styles.message}>Fout bij laden stations</div>;
+  }
 
   return (
     <main className={styles.container}>
       <div className={styles.header}>
-        <Link href="/" className={styles.backLink}>
-          ← Home
-        </Link>
+        <Link href="/" className={styles.backLink}>← Home</Link>
         <h1 className={styles.heading}>Alle stations</h1>
       </div>
 
@@ -100,11 +89,9 @@ export default function StationsPage() {
             total={s.total}
             status={s.status}
             tag={
-              s.free <= 2
-                ? 'Overvol'
-                : s.id === nearestId
-                  ? 'Dichtste bij'
-                  : undefined
+              s.free <= 2 ? 'Overvol'
+                : s.id === nearestId ? 'Dichtste bij'
+                : undefined
             }
           />
         ))}

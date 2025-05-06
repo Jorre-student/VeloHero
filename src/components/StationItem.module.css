@@ -1,5 +1,7 @@
+
 .container {
   position: relative;
+  overflow: visible; /* Laat tag buiten het kader uitsteken */
   background: #ffffff;
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -8,48 +10,55 @@
   justify-content: space-between;
   align-items: center;
 }
-.tagOver {
-  position: absolute;
-  top: 0.75rem;
-  left: 0.75rem;
-  background: #f97316;
-  color: #ffffff;
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.125rem 0.5rem;
-  border-radius: 0.25rem;
-}
+
+/* Tag stijlen */
+.tagOver,
 .tagNearest {
   position: absolute;
-  top: 0.75rem;
-  left: 0.75rem;
-  background: #3b82f6;
-  color: #ffffff;
-  font-size: 0.75rem;
-  font-weight: 600;
+  top: -0.5rem;          /* iets boven de bovenkant */
+  left: 1rem;           /* uitgelijnd met de binnenkant van het kader */
+  z-index: 10;          /* altijd bovenop */
   padding: 0.125rem 0.5rem;
   border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #ffffff;
 }
+
+.tagOver {
+  background: #f97316;  /* oranje voor Overvol */
+}
+
+.tagNearest {
+  background: #3b82f6;  /* blauw voor Dichtste bij */
+}
+
+/* Rest van de component-stijlen */
 .info {
   display: flex;
   flex-direction: column;
 }
+
 .title {
   font-weight: 600;
 }
+
 .distance {
   font-size: 0.875rem;
   color: #6b7280;
 }
+
 .availability {
   font-size: 0.875rem;
   font-weight: 500;
 }
+
 .xp {
   font-weight: 600;
   color: #3b82f6;
   margin-bottom: 0.25rem;
 }
+
 .button {
   padding: 0.25rem 0.75rem;
   border: 1px solid #3b82f6;
@@ -59,10 +68,9 @@
   font-weight: 500;
   color: #3b82f6;
   cursor: pointer;
-  transition:
-    background 0.2s,
-    color 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
+
 .button:hover {
   background: #3b82f6;
   color: #ffffff;

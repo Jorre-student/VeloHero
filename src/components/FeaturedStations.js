@@ -68,11 +68,17 @@ export default function FeaturedStations({
     <section className={styles.container}>
       <div className={styles.sectionWrapper}>
         <h2 className={styles.heading}>Dichtsbijzijnde station</h2>
-        <StationItem {...nearestStation} />
+        <StationItem
+  {...nearestStation}
+  tag={nearestStation.free <= 2 ? 'Overvol' : 'Dichtste bij'}
+/>
       </div>
       <div className={styles.sectionWrapper}>
         <h2 className={styles.heading}>Minste vrije slots</h2>
-        <StationItem {...leastSlotsStation} />
+        <StationItem
+  {...leastSlotsStation}
+  tag={leastSlotsStation.free <= 2 ? 'Overvol' : 'Dichtste bij'}
+/>
       </div>
     </section>
   );

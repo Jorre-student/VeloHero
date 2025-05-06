@@ -1,3 +1,25 @@
 .title {
   color: red;
 }
+.discoverButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #3b82f6;
+  border-radius: 0.5rem;
+  color: #3b82f6;
+  font-weight: 500;
+  background: transparent;
+  transition: background-color 0.2s;
+}
+.discoverButton:hover {
+  background-color: #eff6ff; /* blauw-50 */
+}
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+}
