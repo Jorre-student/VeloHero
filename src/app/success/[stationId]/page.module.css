@@ -1,0 +1,91 @@
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: flex-start;
+  }
+  
+  .cancelButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.5rem;
+    background: white;
+    color: #334155;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+  .cancelButton:hover {
+    background: #f1f5f9;
+  }
+  
+  .intro {
+    margin: 1rem 0;
+    font-size: 1rem;
+    color: #334155;
+  }
+  
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .searchWrapper {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.5rem;
+    background: white;
+    gap: 0.5rem;
+  }
+  
+  .searchWrapper input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 0.9rem;
+    color: #334155;
+  }
+  
+  .sortButton {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.4rem 0.75rem;
+    border: none;
+    background: transparent;
+    font-size: 0.9rem;
+    color: #64748b;
+    cursor: pointer;
+  }
+  .sortButton:hover {
+    color: #1e40af;
+  }
+  .sortButton.active {
+    color: #1e40af;
+    font-weight: 500;
+  }
+  
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .message {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 1rem;
+    color: #64748b;
+  }
+  
