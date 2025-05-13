@@ -81,20 +81,22 @@ export default function StationsPage() {
       <div className={styles.list}>
         {filtered.map((s) => (
           <StationItem
-            key={s.id}
-            name={s.name}
-            distance={s.distanceLabel}
-            distanceValue={s.distance}       // numeric meters
-            xp={s.xp}
-            bikes={s.bikes}
-            total={s.total}
-            status={s.status}
-            tag={
-              s.free <= 2 ? 'Overvol'
-                : s.id === nearestId ? 'Dichtste bij'
-                : undefined
-            }
-          />
+          key={s.id}
+          name={s.name}
+          coords={s.coords}                  // nieuwe prop
+          distance={s.distanceLabel}
+          distanceValue={s.distance}         // raw meters
+          xp={s.xp}
+          bikes={s.bikes}
+          total={s.total}
+          status={s.status}
+          tag={ 
+            s.free <= 2 ? 'Overvol'
+              : s.id === nearestId ? 'Dichtste bij'
+              : undefined
+          }
+        />
+        
         ))}
       </div>
     </main>
