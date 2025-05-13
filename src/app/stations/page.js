@@ -84,6 +84,7 @@ export default function StationsPage() {
             key={s.id}
             name={s.name}
             distance={s.distanceLabel}
+            distanceValue={s.distance}       // numeric meters
             xp={s.xp}
             bikes={s.bikes}
             total={s.total}

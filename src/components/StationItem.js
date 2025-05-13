@@ -1,17 +1,30 @@
 // File: src/components/StationItem.js
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import styles from './StationItem.module.css';
 
 export default function StationItem({
   name,
   distance,
+  distanceValue,   // nummer in meters
   xp,
   bikes,
   total,
-  status,
   tag,
 }) {
+  // haal de raw meters op uit props
+  // Bepaal button label: starten als dichterbij dan 100 m
+  const isNearby = typeof distanceValue === 'number' && distanceValue < 100;
+  const buttonLabel = isNearby ? 'Starten' : 'Route';
+
+  // Logging van elke stap
+  useEffect(() => {
+    console.log(
+      `[StationItem] ${name} → distanceValue: ${distanceValue}m, ` +
+      `label: ${buttonLabel}`
+    );
+  }, [name, distanceValue, buttonLabel]);
+
   return (
     <div className={styles.container}>
       {tag && (
@@ -30,9 +43,9 @@ export default function StationItem({
       </div>
 
       <div className={styles.info}>
-        <div className={styles.xp}>{xp} XP</div>
+        <div className={xp === 0 ? styles.xpZero : styles.xp}>{xp} XP</div>
         <button className={styles.button}>
-          {status === 'open' ? 'Starten' : 'Route'}
+          {buttonLabel}
         </button>
       </div>
     </div>
