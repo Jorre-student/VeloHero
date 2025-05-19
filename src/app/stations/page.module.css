@@ -53,3 +53,22 @@
   color: #555;
   width: 100%;
 }
+
+.modeSwitch {
+  display: inline-flex;
+  border: 1px solid #cbd5e1;
+  border-radius: .5rem;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+.modeSwitch button {
+  padding: .5rem 1rem;
+  border: none;
+  background: white;
+  cursor: pointer;
+  font-weight: 500;
+}
+.modeSwitch button.active {
+  background: #3b82f6;
+  color: white;
+}
