@@ -1,5 +1,6 @@
 // File: src/components/FeaturedStations.js
 'use client';
+
 import React from 'react';
 import StationItem from '@/components/StationItem';
 import { getDistance } from '@/helpers/get-distance';
@@ -26,7 +27,7 @@ export default function FeaturedStations({
     return `${(meters / 1000).toFixed(1)} km`;
   };
 
-  // 1️⃣ Bereken het dichtsbijzijnde station
+  // 1️⃣ Bereken dichtsbijzijnde station
   const nearestStation = stations.reduce((best, station) => {
     const { distance } = getDistance(
       userLocation.lat,
@@ -44,7 +45,7 @@ export default function FeaturedStations({
     return best;
   }, null);
 
-  // 2️⃣ Bereken station met minste vrije slots (en tie-breaker op afstand)
+  // 2️⃣ Bereken station met minste vrije slots
   const minFree = Math.min(...stations.map((s) => s.free));
   const leastSlotsStation = stations
     .filter((s) => s.free === minFree)
@@ -63,22 +64,41 @@ export default function FeaturedStations({
     })
     .sort((a, b) => a.distanceValue - b.distanceValue)[0];
 
-  // 3️⃣ Render beide secties
+  // 3️⃣ Zet tags-array per station
+  const buildTags = (station) => {
+    const tags = [];
+    if (station.free <= 2) tags.push('Overvol');
+    tags.push('Dichtste bij');
+    return tags;
+  };
+
+  const buildTagsLeast = (station) => {
+    const tags = [];
+    if (station.free <= 2) tags.push('Overvol');
+    tags.push('Dichtste bij');
+    return tags;
+  };
+
+  // 4️⃣ Render beide secties
   return (
     <section className={styles.container}>
       <div className={styles.sectionWrapper}>
         <h2 className={styles.heading}>Dichtsbijzijnde station</h2>
-        <StationItem
-  {...nearestStation}
-  tag={nearestStation.free <= 2 ? 'Overvol' : 'Dichtste bij'}
-/>
+        {nearestStation && (
+          <StationItem
+            {...nearestStation}
+            tags={buildTags(nearestStation)}
+          />
+        )}
       </div>
       <div className={styles.sectionWrapper}>
         <h2 className={styles.heading}>Minste vrije slots</h2>
-        <StationItem
-  {...leastSlotsStation}
-  tag={leastSlotsStation.free <= 2 ? 'Overvol' : 'Dichtste bij'}
-/>
+        {leastSlotsStation && (
+          <StationItem
+            {...leastSlotsStation}
+            tags={buildTagsLeast(leastSlotsStation)}
+          />
+        )}
       </div>
     </section>
   );

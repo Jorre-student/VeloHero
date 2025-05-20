@@ -1,4 +1,3 @@
-// File: src/components/StationItem.js
 'use client';
 
 import React, { useEffect } from 'react';
@@ -8,34 +7,31 @@ import styles from './StationItem.module.css';
 export default function StationItem({
   id,
   name,
-  coords,           // { lat, lng }
-  distance,         // string “350 m” of “1.2 km”
-  distanceValue,    // nummer in meters
+  coords,
+  distance,
+  distanceValue,
   xp,
   bikes,
   total,
   status,
-  tag,
+  tags = [],    // nu een array van 0–3 strings
 }) {
   const router = useRouter();
-
-  // bepaal of we “Starten” (dichtbij) of “Route” tonen
-  const isNearby = typeof distanceValue === 'number' && distanceValue < 100;
+  const isNearby = status === 'ophalen'
+    ? distanceValue < 1000
+    : false;  // voor afzetten kun je later een andere drempel kiezen
   const buttonLabel = isNearby ? 'Starten' : 'Route';
 
-  // debug-logging
   useEffect(() => {
     console.log(
-      `[StationItem] ${name} → distanceValue: ${distanceValue}m, label: ${buttonLabel}`
+      `[StationItem] ${name} → xp:${xp}, distance:${distanceValue}m, tags:${tags.join(',')}`
     );
-  }, [name, distanceValue, buttonLabel]);
+  }, [name, xp, distanceValue, tags]);
 
   const handleClick = () => {
     if (isNearby) {
-      // interne navigatie naar onze Start-flow
       router.push(`/start/${id}`);
     } else {
-      // open Google Maps met destination=coords
       const url = `https://www.google.com/maps/dir/?api=1&destination=${coords.lat},${coords.lng}`;
       window.open(url, '_blank');
     }
@@ -43,28 +39,34 @@ export default function StationItem({
 
   return (
     <div className={styles.container}>
-      {tag && (
-        <div className={tag === 'Overvol' ? styles.tagOver : styles.tagNearest}>
-          {tag}
+      {/* Render alle badges */}
+      {tags.length > 0 && (
+        <div className={styles.tags}>
+          {tags.map((t) => {
+            let cls;
+            if (t === 'Overvol')      cls = styles.tagOver;
+            else if (t === 'Te leeg') cls = styles.tagEmpty;
+            else /* Dichtste bij */   cls = styles.tagNearest;
+            return (
+              <span key={t} className={cls}>
+                {t}
+              </span>
+            );
+          })}
         </div>
       )}
 
+      {/* Rest van het kaartje */}
       <div className={styles.info}>
         <div className={styles.title}>{name}</div>
         <div className={styles.distance}>{distance}</div>
       </div>
-
       <div className={styles.availability}>
         {bikes} / {total}
       </div>
-
       <div className={styles.info}>
         <div className={xp === 0 ? styles.xpZero : styles.xp}>{xp} XP</div>
-        <button
-          type="button"
-          onClick={handleClick}
-          className={styles.button}
-        >
+        <button type="button" onClick={handleClick} className={styles.button}>
           {buttonLabel}
         </button>
       </div>

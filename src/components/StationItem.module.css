@@ -1,7 +1,6 @@
-
 .container {
   position: relative;
-  overflow: visible; /* Laat tag buiten het kader uitsteken */
+  overflow: visible; /* Laat tags buiten het kader uitsteken */
   background: #ffffff;
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -11,13 +10,21 @@
   align-items: center;
 }
 
-/* Tag stijlen */
-.tagOver,
-.tagNearest {
+/* 1) Wrapper rond alle badges */
+.tags {
   position: absolute;
-  top: -0.5rem;          /* iets boven de bovenkant */
-  left: 1rem;           /* uitgelijnd met de binnenkant van het kader */
-  z-index: 10;          /* altijd bovenop */
+  top: -0.5rem;
+  left: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+/* 2) Alle badge-stijlen (geen absolute positioning meer) */
+.tagOver,
+.tagNearest,
+.tagEmpty {
+  /* we verwijderen position/top/left uit hier */
   padding: 0.125rem 0.5rem;
   border-radius: 0.25rem;
   font-size: 0.75rem;
@@ -31,6 +38,10 @@
 
 .tagNearest {
   background: #3b82f6;  /* blauw voor Dichtste bij */
+}
+
+.tagEmpty {
+  background: #059669;  /* groen voor Te leeg */
 }
 
 /* Rest van de component-stijlen */
