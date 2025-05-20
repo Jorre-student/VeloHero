@@ -1,4 +1,3 @@
-// File: src/components/FeaturedStations.js
 'use client';
 
 import React from 'react';
@@ -9,94 +8,94 @@ import styles from './FeaturedStations.module.css';
 export default function FeaturedStations({
   stations = [],
   userLocation = { lat: 0, lng: 0 },
+  mode = 'ophalen',    // 'ophalen' of 'afzetten'
+  threshold = 1000,    // afstand in meters voor “dichtbij”
 }) {
-  // 0️⃣ Fallbacks
-  if (stations === undefined) {
-    return <div>Even laden…</div>;
-  }
-  if (stations.length === 0) {
-    return <div>Geen stations gevonden</div>;
-  }
+  if (!stations) return <div>Even laden…</div>;
+  if (stations.length === 0) return <div>Geen stations gevonden</div>;
 
-  // Helper: meters naar leesbare string
-  const formatDist = (meters) => {
-    if (typeof meters !== 'number' || isNaN(meters)) return '–';
-    if (meters < 1000) {
-      return `${meters} m`;
-    }
-    return `${(meters / 1000).toFixed(1)} km`;
-  };
+  const fmt = (m) =>
+    typeof m === 'number' && !isNaN(m)
+      ? m < 1000
+        ? `${m} m`
+        : `${(m / 1000).toFixed(1)} km`
+      : '–';
 
-  // 1️⃣ Bereken dichtsbijzijnde station
-  const nearestStation = stations.reduce((best, station) => {
+  // 1) Dichtsbijzijnde station
+  const nearest = stations.reduce((best, s) => {
     const { distance } = getDistance(
       userLocation.lat,
       userLocation.lng,
-      station.coords.lat,
-      station.coords.lng
+      s.coords.lat,
+      s.coords.lng
     );
-    if (!best || distance < best.distanceValue) {
-      return {
-        ...station,
-        distanceValue: distance,
-        distance: formatDist(distance),
-      };
-    }
-    return best;
+    return !best || distance < best.distanceValue
+      ? { ...s, distanceValue: distance, distance: fmt(distance) }
+      : best;
   }, null);
 
-  // 2️⃣ Bereken station met minste vrije slots
+  // 2) Station met minste vrije slots
   const minFree = Math.min(...stations.map((s) => s.free));
-  const leastSlotsStation = stations
+  const least = stations
     .filter((s) => s.free === minFree)
-    .map((station) => {
+    .map((s) => {
       const { distance } = getDistance(
         userLocation.lat,
         userLocation.lng,
-        station.coords.lat,
-        station.coords.lng
+        s.coords.lat,
+        s.coords.lng
       );
-      return {
-        ...station,
-        distanceValue: distance,
-        distance: formatDist(distance),
-      };
+      return { ...s, distanceValue: distance, distance: fmt(distance) };
     })
     .sort((a, b) => a.distanceValue - b.distanceValue)[0];
 
-  // 3️⃣ Zet tags-array per station
-  const buildTags = (station) => {
+  // 3) Tags helper
+  const makeTags = (s) => {
     const tags = [];
-    if (station.free <= 2) tags.push('Overvol');
+    if (s.free <= 2) tags.push('Overvol');
+    if (s.bikes <= 2) tags.push('Te leeg');
     tags.push('Dichtste bij');
     return tags;
   };
 
-  const buildTagsLeast = (station) => {
-    const tags = [];
-    if (station.free <= 2) tags.push('Overvol');
-    tags.push('Dichtste bij');
-    return tags;
-  };
-
-  // 4️⃣ Render beide secties
   return (
     <section className={styles.container}>
+      {/* Dichtsbijzijnde */}
       <div className={styles.sectionWrapper}>
         <h2 className={styles.heading}>Dichtsbijzijnde station</h2>
-        {nearestStation && (
+        {nearest && (
           <StationItem
-            {...nearestStation}
-            tags={buildTags(nearestStation)}
+            id={nearest.id}
+            name={nearest.name}
+            coords={nearest.coords}
+            distance={nearest.distance}
+            distanceValue={nearest.distanceValue}
+            xp={nearest.xp}
+            bikes={nearest.bikes}
+            total={nearest.total}
+            mode={mode}
+            tags={makeTags(nearest)}
+            threshold={threshold}
           />
         )}
       </div>
+
+      {/* Minste vrije slots */}
       <div className={styles.sectionWrapper}>
         <h2 className={styles.heading}>Minste vrije slots</h2>
-        {leastSlotsStation && (
+        {least && (
           <StationItem
-            {...leastSlotsStation}
-            tags={buildTagsLeast(leastSlotsStation)}
+            id={least.id}
+            name={least.name}
+            coords={least.coords}
+            distance={least.distance}
+            distanceValue={least.distanceValue}
+            xp={least.xp}
+            bikes={least.bikes}
+            total={least.total}
+            mode={mode}
+            tags={makeTags(least)}
+            threshold={threshold}
           />
         )}
       </div>

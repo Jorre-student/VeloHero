@@ -8,71 +8,42 @@ import useNetwork from '@/data/network';
 import styles from './page.module.css';
 
 export default function StationsPage() {
-  // 1) State & data‐hook
-  const [mode, setMode]     = useState('ophalen');  // 'ophalen' of 'afzetten'
+  // 1) state/hooks
+  const [mode, setMode] = useState('ophalen');   // 'ophalen' of 'afzetten'
   const [search, setSearch] = useState('');
-  const [sortBy, setSortBy] = useState('xp');       // 'xp' of 'distance'
+  const [sortBy, setSortBy] = useState('xp');    // 'xp' of 'distance'
   const { stations, userLocation, isLoading, isError } = useNetwork();
 
-  // 2) Verrijk met bezettings%, XP en afstand
+  // 2) verrijk stations met afstand en label
   const enriched = useMemo(() => {
     return stations.map((s) => {
-      const total    = s.bikes + s.free;
-      const occupied = (s.bikes / total) * 100;       // % bezet
-
-      let xp = 0;
-      if (mode === 'ophalen') {
-        if (occupied >= 60) {
-          xp = ((occupied - 60) / 40) * 100;
-        }
-      } else {
-        if (occupied <= 40) {
-          xp = ((40 - occupied) / 40) * 100;
-        }
-      }
-      xp = Math.max(0, Math.min(100, Math.round(xp)));
-
-      const { distance: distMeters } = getDistance(
+      const { distance } = getDistance(
         userLocation.lat,
         userLocation.lng,
         s.coords.lat,
         s.coords.lng
       );
       const distanceLabel =
-        distMeters < 1000
-          ? `${distMeters} m`
-          : `${(distMeters / 1000).toFixed(1)} km`;
-
-      return {
-        ...s,
-        occupied,
-        xp,
-        distanceValue: distMeters,
-        distanceLabel,
-      };
+        distance < 1000 ? `${distance} m` : `${(distance / 1000).toFixed(1)} km`;
+      return { ...s, distanceValue: distance, distanceLabel };
     });
-  }, [stations, userLocation, mode]);
+  }, [stations, userLocation]);
 
-// 3) Bepaal dichtsbijzijnde station *onder de XP-kandidaten*
-const nearestId = useMemo(() => {
-  // 3a) Bekijken welke stations xp>0 hebben (mode-specifiek)
-  const candidates = enriched.filter((s) => s.xp > 0);
-  if (candidates.length === 0) return null;
+  // 3) bepaal dichtsbijzijnde station‐ID
+  const nearestId = useMemo(() => {
+    if (enriched.length === 0) return null;
+    const nearest = enriched.reduce((prev, curr) =>
+      prev.distanceValue < curr.distanceValue ? prev : curr
+    );
+    return nearest.id;
+  }, [enriched]);
 
-  // 3b) Reduce op afstand
-  const nearest = candidates.reduce((best, s) => {
-    if (!best || s.distanceValue < best.distanceValue) return s;
-    return best;
-  }, null);
-
-  return nearest.id;
-}, [enriched]);
-
-
-  // 4) Filter & sort
+  // 4) filter & sort
   const filtered = useMemo(() => {
     return enriched
-      .filter((s) => s.xp > 0 && s.name.toLowerCase().includes(search.toLowerCase()))
+      .filter((s) =>
+        s.name.toLowerCase().includes(search.toLowerCase())
+      )
       .sort((a, b) =>
         sortBy === 'distance'
           ? a.distanceValue - b.distanceValue
@@ -80,20 +51,18 @@ const nearestId = useMemo(() => {
       );
   }, [enriched, search, sortBy]);
 
-  // 5) Loading / Error
+  // 5) loading / error
   if (isLoading) return <div className={styles.message}>Even laden…</div>;
-  if (isError)   return <div className={styles.message}>Fout bij laden stations</div>;
+  if (isError)   return <div className={styles.message}>Fout bij laden</div>;
 
-  // 6) Render
+  // 6) render
   return (
     <main className={styles.container}>
-      {/* Header */}
+      {/* Header + mode‐switch */}
       <div className={styles.header}>
         <Link href="/" className={styles.backLink}>← Home</Link>
         <h1 className={styles.heading}>Alle stations</h1>
       </div>
-
-      {/* Mode‐switch */}
       <div className={styles.modeSwitch}>
         <button
           className={mode === 'ophalen' ? styles.active : ''}
@@ -136,29 +105,28 @@ const nearestId = useMemo(() => {
 
       {/* Stationslijst */}
       <div className={styles.list}>
-        {filtered.map((s) => {
-          // bouw tags-array
-          const tags = [];
-          if (s.free <= 2) tags.push('Overvol');
-          if (s.bikes <= 2) tags.push('Te leeg');
-          if (s.id === nearestId) tags.push('Dichtste bij');
-
-          return (
-            <StationItem
-              key={s.id}
-              id={s.id}
-              name={s.name}
-              coords={s.coords}
-              distance={s.distanceLabel}
-              distanceValue={s.distanceValue}
-              xp={s.xp}
-              bikes={s.bikes}
-              total={s.bikes + s.free}
-              status={mode}
-              tags={tags}
-            />
-          );
-        })}
+        {filtered.map((s) => (
+          <StationItem
+            key={s.id}
+            id={s.id}
+            name={s.name}
+            coords={s.coords}
+            distance={s.distanceLabel}
+            distanceValue={s.distanceValue}
+            xp={s.xp}
+            bikes={s.bikes}
+            total={s.total}
+            mode={mode}
+            tags={
+              s.free <= 2
+                ? ['Overvol']
+                : s.id === nearestId
+                ? ['Dichtste bij']
+                : []
+            }
+            threshold={1000}
+          />
+        ))}
       </div>
     </main>
   );

@@ -2,48 +2,49 @@
 
 import React from 'react';
 import Link from 'next/link';
+import useNetwork from '@/data/network';
+import useProgress from '@/hooks/useProgress';
 import StatsCard from '@/components/StatsCard';
 import FeaturedStations from '@/components/FeaturedStations';
-import useNetwork from '@/data/network';
 import styles from './page.module.css';
 
-// Dummy data voor StatsCard
-const stats = {
-  level: 5,
-  xp: 125,
-  xpToNext: 250,
-  bikesMoved: 32,
-  stationsHelped: 6,
-};
-
 export default function Home() {
+  // 1) Haal netwerk‐data
   const { stations, userLocation, isLoading, isError } = useNetwork();
 
-  if (isLoading) {
-    return <div className="text-center mt-8">Even laden…</div>;
-  }
-  if (isError) {
-    return <div className="text-center mt-8">Fout bij laden data</div>;
-  }
+  // 2) Haal voortgangs‐data
+  const { level, xp, xpToNext, bikesMoved, stationsHelped } = useProgress();
 
+  // 3) Loading/Error
+  if (isLoading) return <div>Even laden…</div>;
+  if (isError)   return <div>Fout bij laden gegevens</div>;
+
+  // 4) Render
   return (
     <main className={styles.container}>
-      {/* 1) StatsCard */}
-      <StatsCard {...stats} />
+      {/* Stats-kaart */}
+      <StatsCard
+        level={level}
+        xp={xp}
+        xpToNext={xpToNext}
+        bikesMoved={bikesMoved}
+        stationsHelped={stationsHelped}
+      />
 
-      {/* 2) FeaturedStations */}
+      {/* FeaturedStations altijd in 'ophalen'-mode */}
       <FeaturedStations
         stations={stations}
         userLocation={userLocation}
+        mode="ophalen"
+        threshold={1000}  // of je gewenste afstand
       />
 
-      {/* 3) Ontdek alle stations button */}
-      <div className="mt-6">
+      {/* Ontdek-knop */}
+      <div className={styles.discoverWrapper}>
         <Link href="/stations">
-        <button className={styles.discoverButton}>
-  📍 Ontdek alle stations
-</button>
-
+          <button className={styles.discoverButton}>
+            📍 Ontdek alle stations
+          </button>
         </Link>
       </div>
     </main>

@@ -1,0 +1,108 @@
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    text-align: center;
+  }
+  
+  /* Titels */
+  .heading {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  .subheading {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    color: #334155;
+  }
+  
+  /* Timer */
+  .timerWrapper {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 1rem;
+  }
+  .circle {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+  .circleBg {
+    fill: none;
+    stroke: #e5e7eb;
+    stroke-width: 10;
+  }
+  .circleFg {
+    fill: none;
+    stroke: #3b82f6;
+    stroke-width: 10;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.3s linear;
+  }
+  .timerText {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    font-weight: 700;
+  }
+  
+  /* Beschikbaarheid */
+  .availabilitySmall {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #334155;
+    margin-bottom: 2rem;
+  }
+  
+  /* Result schermen */
+  .resultWrapper {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .checkCircle,
+  .crossCircle {
+    font-size: 4rem;
+    width: 200px;
+    height: 200px;
+    border: 10px solid;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .checkCircle {
+    border-color: #10b981; /* green-500 */
+    color: #10b981;
+  }
+  .crossCircle {
+    border-color: #ef4444; /* red-500 */
+    color: #ef4444;
+  }
+  
+  /* Buttons */
+  .cancelButton,
+  .claimButton {
+    padding: 0.75rem 1.5rem;
+    border: 1px solid #3b82f6;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: #3b82f6;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .cancelButton:hover,
+  .claimButton:hover {
+    background: #3b82f6;
+    color: #fff;
+  }
+  

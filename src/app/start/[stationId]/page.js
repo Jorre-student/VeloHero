@@ -1,95 +1,120 @@
-// File: src/app/start/[stationId]/page.js
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import useNetwork from '@/data/network';
 import fetcher from '@/data/_fetcher';
 import styles from './page.module.css';
 
 export default function StartPage() {
   const { stationId } = useParams();
-  const router = useRouter();
+  const router       = useRouter();
+  const searchParams = useSearchParams();
 
-  // 1️⃣ Countdown state
-  const [secondsLeft, setSecondsLeft] = useState(60);
+  // Mode & berekende XP uit de URL
+  const mode    = searchParams.get('mode') === 'afzetten' ? 'afzetten' : 'ophalen';
+  const gainedXp = Number(searchParams.get('xp')) || 0;
 
-  // 2️⃣ Initial count vrije slots
-  const [initialFree, setInitialFree] = useState(null);
+  // States
+  const [secondsLeft, setSecondsLeft]   = useState(60);
+  const [initialBikes, setInitialBikes] = useState(null);
+  const [status, setStatus]             = useState('pending'); 
+  // 'pending' | 'success' | 'failure'
 
-  // 3️⃣ Debug-flag om removal te simuleren
-  const [simulateRemoval, setSimulateRemoval] = useState(false);
-
-  // 4️⃣ Haal stations uit je hook
+  // Haal alle stations uit de hook
   const { stations } = useNetwork();
 
-  // 5️⃣ Countdown-effect
+  // Zoek huidig station
+  const currentStation = useMemo(
+    () => stations.find((s) => s.id === stationId),
+    [stations, stationId]
+  );
+  const stationName = currentStation?.name ?? stationId;
+
+  // Sla initiële bike-count op
   useEffect(() => {
-    if (secondsLeft > 0) {
-      const timerId = setTimeout(() => {
-        setSecondsLeft((s) => s - 1);
-      }, 1000);
-      return () => clearTimeout(timerId);
+    if (currentStation && initialBikes === null) {
+      setInitialBikes(currentStation.bikes);
     }
+  }, [currentStation, initialBikes]);
+
+  // Countdown‐effect
+  useEffect(() => {
+    if (status !== 'pending') return;
+    if (secondsLeft <= 0) {
+      setStatus('failure');
+      return;
+    }
+    const id = setTimeout(() => setSecondsLeft((s) => s - 1), 1000);
+    return () => clearTimeout(id);
+  }, [secondsLeft, status]);
+
+  // Polling: detecteer bike-count verandering
+  useEffect(() => {
+    if (status !== 'pending' || initialBikes === null) return;
+    const iv = setInterval(async () => {
+      try {
+        const data = await fetcher(
+          'https://api.citybik.es/v2/networks/velo-antwerpen'
+        );
+        const st = data.network.stations.find((s) => s.id === stationId);
+        if (!st) return;
+
+        if (mode === 'ophalen' && st.bikes < initialBikes) {
+          clearInterval(iv);
+          setStatus('success');
+        }
+        if (mode === 'afzetten' && st.bikes > initialBikes) {
+          clearInterval(iv);
+          setStatus('success');
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }, 1000);
+    return () => clearInterval(iv);
+  }, [initialBikes, stationId, status, mode]);
+
+  // SVG‐progress berekenen
+  const { circumference, progressOffset } = useMemo(() => {
+    const radius = 45;
+    const c = 2 * Math.PI * radius;
+    const pct = (60 - secondsLeft) / 60;
+    return { circumference: c, progressOffset: pct * c };
   }, [secondsLeft]);
 
-  // 6️⃣ Sla initialFree op als stations geladen zijn
-  useEffect(() => {
-    if (initialFree === null && stations.length > 0) {
-      const st = stations.find((s) => s.id === stationId);
-      if (st) {
-        setInitialFree(st.free);
-        console.log(`🚩 initialFree voor ${stationId}:`, st.free);
-      }
-    }
-  }, [stations, stationId, initialFree]);
+  // === RENDER ===
+  if (status === 'pending') {
+    return (
+      <main className={styles.container}>
+        <h1 className={styles.heading}>{stationName}</h1>
+        <p className={styles.subheading}>
+          {mode === 'ophalen'
+            ? 'Neem een fiets binnen de tijd'
+            : 'Plaats een fiets binnen de tijd'}
+        </p>
 
-  // 7️⃣ Polling-effect, elke seconde free_bikes loggen en removal detecteren
-  useEffect(() => {
-    if (initialFree !== null && secondsLeft > 0) {
-      const intervalId = setInterval(async () => {
-        try {
-          const data = await fetcher(
-            'https://api.citybik.es/v2/networks/velo-antwerpen'
-          );
-          const st = data.network.stations.find((s) => s.id === stationId);
-          if (st) {
-            // 🔍 Log het actuele aantal fietsen (free_bikes)
-            console.log(`[Polling] huidige free_bikes voor ${stationId}:`, st.free_bikes);
+        <div className={styles.timerWrapper}>
+          <svg className={styles.circle} viewBox="0 0 100 100">
+            <circle className={styles.circleBg} cx="50" cy="50" r="45" />
+            <circle
+              className={styles.circleFg}
+              cx="50"
+              cy="50"
+              r="45"
+              strokeDasharray={circumference}
+              strokeDashoffset={progressOffset}
+            />
+          </svg>
+          <div className={styles.timerText}>{secondsLeft} s</div>
+        </div>
 
-            // ▶️ Simulatie
-            if (simulateRemoval) {
-              clearInterval(intervalId);
-              console.log('✅ Simulated removal!');
-              router.push(`/success/${stationId}`);
-              return;
-            }
+        {initialBikes !== null && (
+          <div className={styles.availabilitySmall}>
+            {initialBikes}/{currentStation.bikes + currentStation.free}
+          </div>
+        )}
 
-            // ✅ Detectie echte removal
-            if (st.empty_slots < initialFree) {
-              console.log('✅ Fietsremoval gedetecteerd!');
-              clearInterval(intervalId);
-              setSecondsLeft(0);
-              router.push(`/success/${stationId}`);
-            }
-          }
-        } catch (err) {
-          console.error('Polling fout:', err);
-        }
-      }, 1000);
-
-      return () => clearInterval(intervalId);
-    }
-  }, [initialFree, secondsLeft, stationId, router, simulateRemoval]);
-
-  return (
-    <main className={styles.container}>
-      <h1 className={styles.heading}>Station {stationId}</h1>
-      <p>Neem een fiets binnen de tijd</p>
-
-      <div className={styles.timer}>{secondsLeft} s</div>
-
-      <div className={styles.buttons}>
         <button
           type="button"
           className={styles.cancelButton}
@@ -97,15 +122,49 @@ export default function StartPage() {
         >
           Annuleren
         </button>
+      </main>
+    );
+  }
 
+  if (status === 'success') {
+    return (
+      <main className={styles.container}>
+        <h1 className={styles.heading}>{stationName}</h1>
+        <p className={styles.subheading}>
+          {mode === 'ophalen'
+            ? 'Je hebt een fiets binnen de tijd genomen'
+            : 'Je hebt een fiets binnen de tijd geplaatst'}
+        </p>
+        <div className={styles.resultWrapper}>
+          <div className={styles.checkCircle}>✔︎</div>
+        </div>
         <button
           type="button"
-          className={styles.simulateButton}
-          onClick={() => setSimulateRemoval(true)}
+          className={styles.claimButton}
+          onClick={() => router.push('/')}
         >
-          Simuleer weghalen
+          Ontvang {gainedXp} XP
         </button>
+      </main>
+    );
+  }
+
+  return (
+    <main className={styles.container}>
+      <h1 className={styles.heading}>{stationName}</h1>
+      <p className={styles.subheading}>
+        Tijd verlopen!
+      </p>
+      <div className={styles.resultWrapper}>
+        <div className={styles.crossCircle}>✕</div>
       </div>
+      <button
+        type="button"
+        className={styles.claimButton}
+        onClick={() => router.push('/')}
+      >
+        Opnieuw proberen
+      </button>
     </main>
   );
 }
