@@ -9,7 +9,7 @@ export default function FeaturedStations({
   stations = [],
   userLocation = { lat: 0, lng: 0 },
   mode = 'ophalen',    // 'ophalen' of 'afzetten'
-  threshold = 1000,    // afstand in meters voor “dichtbij”
+  threshold = 100,    // afstand in meters voor “dichtbij”
 }) {
   if (!stations) return <div>Even laden…</div>;
   if (stations.length === 0) return <div>Geen stations gevonden</div>;

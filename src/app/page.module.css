@@ -1,25 +1,36 @@
-.title {
-  color: red;
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
 }
+
+.discoverWrapper {
+  margin-top: 1.5rem;
+}
+
 .discoverButton {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #3b82f6;
-  border-radius: 0.5rem;
-  color: #3b82f6;
-  font-weight: 500;
-  background: transparent;
+  padding: 0.75rem 1rem;
+  border: 2px solid #0092FF;
+  border-radius: 0.75rem;
+
+  background-color: #F0F8FF;
+  color: #0092FF;
+
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
   transition: background-color 0.2s;
+
+  /* verwijder standaard onderlijning */
+  text-decoration: none;
 }
+
 .discoverButton:hover {
-  background-color: #eff6ff; /* blauw-50 */
-}
-.container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 1rem;
+  background-color: rgba(0, 146, 255, 0.1);
 }

@@ -15,7 +15,7 @@ export default function StationItem({
   total,
   mode = 'ophalen',   // 'ophalen' of 'afzetten'
   tags = [],          // array met badges
-  threshold = 1000,   // afstand in meters voor “dichtbij”
+  threshold = 100,   // afstand in meters voor “dichtbij”
 }) {
   const router = useRouter();
 
